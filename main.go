@@ -14,10 +14,10 @@ type Config struct {
 }
 
 type App struct {
-	Name       string
-	Path       string
-	Predeploy  []string
-	Postdeploy []string
+	Name     string
+	Path     string
+	Commands []string
+	Secret   string
 }
 
 func main() {
@@ -35,6 +35,21 @@ func main() {
 	r := gin.Default()
 	r.GET("/up", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{"status": "ok"})
+	})
+	r.POST("/trigger/:project", func(ctx *gin.Context) {
+		project := ctx.Param("project")
+		event := ctx.GetHeader("x-github-event")
+		if _, ok := config.Apps[project]; ok {
+			//TODO do the thing with the secret
+			switch event {
+			case "ping":
+				ctx.String(200, "pong")
+				break
+			case "release":
+				break
+			}
+		}
+		ctx.String(200, project)
 	})
 	r.Run()
 }
