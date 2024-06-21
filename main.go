@@ -24,6 +24,15 @@ type App struct {
 	Secret   string
 }
 
+type GithubRelease struct {
+	TagName string `json:"tag_name"`
+}
+
+type GithubReleasePayload struct {
+	Action  string `json:"action"`
+	Release GithubRelease
+}
+
 func main() {
 	var configPath string
 	var config Config
@@ -48,6 +57,7 @@ func main() {
 			payload, err := io.ReadAll(ctx.Request.Body)
 			if err != nil {
 				ctx.String(500, "could not parse body")
+				return
 			}
 			mac := hmac.New(sha256.New, []byte(projectConfig.Secret))
 			mac.Write(payload)
@@ -60,6 +70,12 @@ func main() {
 			case "ping":
 				break
 			case "release":
+				var releasePayload GithubReleasePayload
+				if err := ctx.BindJSON(&releasePayload); err != nil {
+					ctx.String(500, "could not parse data")
+					return
+				}
+				fmt.Println(releasePayload.Action)
 				break
 			}
 			ctx.String(200, "ok")
