@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -39,17 +42,25 @@ func main() {
 	r.POST("/trigger/:project", func(ctx *gin.Context) {
 		project := ctx.Param("project")
 		event := ctx.GetHeader("x-github-event")
-		if _, ok := config.Apps[project]; ok {
+		if projectConfig, ok := config.Apps[project]; ok {
 			//TODO do the thing with the secret
+			signature := ctx.GetHeader("X-Hub-Signature-256")
+			payload, err := io.ReadAll(ctx.Request.Body)
+			if err != nil {
+				//TODO do something here
+			}
+			mac := hmac.New(sha256.New, []byte(projectConfig.Secret))
+			mac.Write(payload)
+			if !hmac.Equal([]byte(signature[7:]), mac.Sum(nil)) {
+				ctx.String(500, "invalid secret")
+			}
 			switch event {
 			case "ping":
-				ctx.String(200, "pong")
 				break
 			case "release":
 				break
 			}
 		}
-		ctx.String(200, project)
 	})
 	r.Run()
 }
