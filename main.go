@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"io"
@@ -34,7 +35,6 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Println(config)
 	r := gin.Default()
 	r.GET("/up", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{"status": "ok"})
@@ -47,12 +47,14 @@ func main() {
 			signature := ctx.GetHeader("X-Hub-Signature-256")
 			payload, err := io.ReadAll(ctx.Request.Body)
 			if err != nil {
-				//TODO do something here
+				ctx.String(500, "could not parse body")
 			}
 			mac := hmac.New(sha256.New, []byte(projectConfig.Secret))
 			mac.Write(payload)
-			if !hmac.Equal([]byte(signature[7:]), mac.Sum(nil)) {
+			macValue := hex.EncodeToString(mac.Sum(nil))
+			if !hmac.Equal([]byte(signature[7:]), []byte(macValue)) {
 				ctx.String(500, "invalid secret")
+				return
 			}
 			switch event {
 			case "ping":
@@ -60,6 +62,7 @@ func main() {
 			case "release":
 				break
 			}
+			ctx.String(200, "ok")
 		}
 	})
 	r.Run()
