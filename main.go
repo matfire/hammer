@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -11,31 +12,13 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
+	"github.com/matfire/hammer/git"
+	"github.com/matfire/hammer/types"
 )
-
-type Config struct {
-	Apps map[string]App
-}
-
-type App struct {
-	Name     string
-	Path     string
-	Commands []string
-	Secret   string
-}
-
-type GithubRelease struct {
-	TagName string `json:"tag_name"`
-}
-
-type GithubReleasePayload struct {
-	Action  string `json:"action"`
-	Release GithubRelease
-}
 
 func main() {
 	var configPath string
-	var config Config
+	var config types.Config
 
 	flag.StringVar(&configPath, "config", "./config.toml", `Path to config file (defaults to current dir's config.toml)`)
 	flag.Parse()
@@ -70,12 +53,13 @@ func main() {
 			case "ping":
 				break
 			case "release":
-				var releasePayload GithubReleasePayload
-				if err := ctx.BindJSON(&releasePayload); err != nil {
-					ctx.String(500, "could not parse data")
+				var releasePayload types.GithubReleasePayload
+				if err := json.Unmarshal(payload, &releasePayload); err != nil {
+					ctx.String(500, "cannot parse body data")
 					return
 				}
-				fmt.Println(releasePayload.Action)
+				fmt.Println(releasePayload)
+				git.Pull(config, projectConfig, releasePayload)
 				break
 			}
 			ctx.String(200, "ok")
