@@ -53,3 +53,6 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+universal_binaries:
+  - replace: true
