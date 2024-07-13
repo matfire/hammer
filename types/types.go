@@ -1,10 +1,7 @@
 package types
 
 type Config struct {
-	Username string
-	Password string
-	Shell    string
-	Apps     map[string]App
+	Apps map[string]App
 }
 
 type App struct {
