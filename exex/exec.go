@@ -2,18 +2,17 @@ package exex
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 )
 
-func Exec(command string, path string) {
-	cmd := exec.Command(command)
-	cmd.Path = path
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+// TODO send writer to log file instead of stdout, stderr
+func Exec(command string, path string) error {
+	cmd := exec.Command("sh", "-c", command)
+	cmd.Dir = path
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println(err)
-		panic("could not execute command: " + command)
+		return err
 	}
+	return nil
 }
