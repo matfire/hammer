@@ -1,6 +1,7 @@
 package git
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-git/go-git/v5/plumbing"
 
@@ -22,7 +23,7 @@ func Pull(config types.Config, app types.App, releasePayload types.GithubRelease
 		panic("could not get worktree")
 	}
 	err = workTree.Pull(&git.PullOptions{})
-	if err != nil {
+	if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
 		fmt.Println(err)
 		panic("could not pull")
 	}
