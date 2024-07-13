@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"github.com/go-git/go-git/v5/plumbing"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -25,5 +26,9 @@ func Pull(config types.Config, app types.App, releasePayload types.GithubRelease
 	err = workTree.Pull(&git.PullOptions{Auth: auth})
 	if err != nil {
 		panic("could not pull")
+	}
+	err = workTree.Checkout(&git.CheckoutOptions{Branch: plumbing.ReferenceName(releasePayload.Release.TagName)})
+	if err != nil {
+		panic("could not checkout specified tag")
 	}
 }
