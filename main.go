@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/matfire/hammer/exex"
 	"io"
 	"os"
 
@@ -59,6 +60,9 @@ func main() {
 					return
 				}
 				git.Pull(config, projectConfig, releasePayload)
+				for i := 0; i < len(projectConfig.Commands); i++ {
+					exex.Exec(projectConfig.Commands[i], projectConfig.Path)
+				}
 				break
 			}
 			ctx.String(200, "ok")
