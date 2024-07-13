@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/matfire/hammer/exex"
+	"github.com/matfire/hammer/exec"
 	"io"
 	"log/slog"
 	"os"
@@ -68,7 +68,7 @@ func main() {
 				git.Pull(config, projectConfig, releasePayload)
 				for i := 0; i < len(projectConfig.Commands); i++ {
 					logger.Info("executing command", "project", project, "command", projectConfig.Commands[i], "index", i)
-					err = exex.Exec(projectConfig.Commands[i], projectConfig.Path)
+					err = exec.Exec(projectConfig.Commands[i], projectConfig.Path)
 					if err != nil {
 						logger.Error("failed executing command", "project", project, "command", projectConfig.Commands[i], "index", i)
 						ctx.String(500, "failed to execute command number "+strconv.Itoa(i))

@@ -1,4 +1,4 @@
-package exex
+package exec
 
 import (
 	"fmt"
