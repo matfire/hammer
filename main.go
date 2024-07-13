@@ -58,7 +58,6 @@ func main() {
 					ctx.String(500, "cannot parse body data")
 					return
 				}
-				fmt.Println(releasePayload)
 				git.Pull(config, projectConfig, releasePayload)
 				break
 			}
