@@ -1,6 +1,9 @@
 # Hammer
 
-> easily execute commands on release
+> when all you have is a hammer, all deployments are nails
+
+![GitHub Release](https://img.shields.io/github/v/release/matfire/hammer?style=for-the-badge)
+
 
 ## Description
 
@@ -64,3 +67,20 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+
+The next step in deploying this solution is putting it behind a web proxy. This is done mainly so that github can send webhooks to the service because it requires an https domain.
+There are tons of solution from the most used (like Nginx and Apache), to more niche ones (like Traefik - at least for a simple reverse proxy), but the one I recommend for solutions like these is [caddy](https://caddyserver.com)
+
+A simple Caddyfile for **hammer** might look like this:
+
+```
+example.com {
+  reverse_proxy :8080
+}
+```
+
+## Extra
+
+You can also change some configuration using environment variables, mainly those of [gin](https://gin-gonic.com/)
+
+- PORT: to change the webservice's default port (otherwise, it will stay as 8080)
