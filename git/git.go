@@ -27,8 +27,9 @@ func Pull(config types.Config, app types.App, releasePayload types.GithubRelease
 		fmt.Println(err)
 		panic("could not pull")
 	}
-	err = workTree.Checkout(&git.CheckoutOptions{Branch: plumbing.ReferenceName(releasePayload.Release.TagName)})
+	err = workTree.Checkout(&git.CheckoutOptions{Branch: plumbing.NewTagReferenceName(releasePayload.Release.TagName)})
 	if err != nil {
+		fmt.Println(err)
 		panic("could not checkout specified tag")
 	}
 }
