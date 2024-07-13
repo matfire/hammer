@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"github.com/matfire/hammer/exex"
 	"io"
+	"log/slog"
 	"os"
+	"strconv"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
@@ -28,6 +30,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.GET("/up", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{"status": "ok"})
@@ -36,7 +40,7 @@ func main() {
 		project := ctx.Param("project")
 		event := ctx.GetHeader("x-github-event")
 		if projectConfig, ok := config.Apps[project]; ok {
-			//TODO do the thing with the secret
+			logger.Info("triggering event", "project", project, "event", event)
 			signature := ctx.GetHeader("X-Hub-Signature-256")
 			payload, err := io.ReadAll(ctx.Request.Body)
 			if err != nil {
@@ -51,8 +55,6 @@ func main() {
 				return
 			}
 			switch event {
-			case "ping":
-				break
 			case "release":
 				var releasePayload types.GithubReleasePayload
 				if err := json.Unmarshal(payload, &releasePayload); err != nil {
@@ -61,12 +63,25 @@ func main() {
 				}
 				git.Pull(config, projectConfig, releasePayload)
 				for i := 0; i < len(projectConfig.Commands); i++ {
-					exex.Exec(projectConfig.Commands[i], projectConfig.Path)
+					logger.Info("executing command", "project", project, "command", projectConfig.Commands[i], "index", i)
+					err = exex.Exec(projectConfig.Commands[i], projectConfig.Path)
+					if err != nil {
+						logger.Error("failed executing command", "project", project, "command", projectConfig.Commands[i], "index", i)
+						ctx.String(500, "failed to execute command number "+strconv.Itoa(i))
+						break
+					}
+					logger.Info("finished executing command", "project", project, "command", projectConfig.Commands[i], "index", i)
 				}
 				break
+			default:
+				ctx.String(500, "unsupported event")
 			}
-			ctx.String(200, "ok")
+		} else {
+			logger.Error("failed to process event for project", "project", project)
 		}
 	})
-	r.Run()
+	err = r.Run()
+	if err != nil {
+		panic("could not run server")
+	}
 }
