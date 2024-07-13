@@ -22,15 +22,19 @@ import (
 func main() {
 	var configPath string
 	var config types.Config
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	flag.StringVar(&configPath, "config", "./config.toml", `Path to config file (defaults to current dir's config.toml)`)
 	flag.Parse()
+	logger.Info("parsed flags")
+	logger.Info("decoding toml file")
 	_, err := toml.DecodeFile(configPath, &config)
 	if err != nil {
+		logger.Error("failed decoding toml file")
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger.Info("decoded toml file")
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.GET("/up", func(ctx *gin.Context) {
