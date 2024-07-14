@@ -64,15 +64,3 @@ brews:
       owner: matfire
       name: homebrew-matfire
       token: "{{ .Env.GITHUB_TOKEN }}"
-
-nfpms:
-  - package_name: hammer
-    homepage: https://hammer.matteogassend.com
-    maintainer: Matteo <mgassend@gmail.com>
-    license: MIT
-    formats:
-      - apk
-      - deb
-      - rpm
-      - termux.deb
-      - archlinux
