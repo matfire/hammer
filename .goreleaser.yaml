@@ -56,3 +56,11 @@ changelog:
 
 universal_binaries:
   - replace: true
+
+brews:
+  - name: hammer
+    homepage: https://hammer.matteogassend.com
+    repository:
+      owner: matfire
+      name: homebrew-matfire
+      token: "{{ .Env.PUBLISHER_TOKEN }}"
