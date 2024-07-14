@@ -26,6 +26,17 @@ I wanted a way to simplify this. A service that could receive a release notifica
 > [!IMPORTANT]
 > by default the programs are executed using the **sh** interpreter; be careful any program you need to run can be run using sh
 
+## Installation
+
+You can find the latest release files in the release section if you just want the binary.
+
+You can also install it using homebrew by running:
+```shell
+brew install matfire/matfire/hammer
+```
+
+Then you can run it using `hammer`
+
 ## The config file
 
 The config file is written in the TOML format and should be formatted as follows:
@@ -50,6 +61,12 @@ commands=["pnpm ci", "pnpm build"]
 - Create a config file (the program by default looks for a **config.toml** file in the same folder as the executable)
 - Run the program (there is an example systemd service in the [deployment](#deployment) section)
 - Enjoy :)
+
+### Options
+
+There are flags you can pass to the program:
+
+- `--config`: enables to specify the path for the config file (ex: `hammer --config path/to/your/config.toml`)
 
 ## Deployment
 
