@@ -60,7 +60,11 @@ commands=["pnpm ci", "pnpm build"]
 
 - Create a config file (the program by default looks for a **config.toml** file in the same folder as the executable)
 - Run the program (there is an example systemd service in the [deployment](#deployment) section)
+- Point your webhook to the url `/trigger/<your_project_name>` where `<your_project_name>` is the name specified after `apps.` in the toml file
 - Enjoy :)
+
+> [!CAUTION]
+> Github expects a response in less than 10 seconds when sending a webhook, so make sure the scripts you run take less than that. This might get addressed in a later release, but I want to point this out now
 
 ### Options
 
