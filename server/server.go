@@ -19,7 +19,7 @@ func handleTrigger(w http.ResponseWriter, r *http.Request, config *types.Config,
 	event := r.Header.Get("x-github-event")
 	if projectConfig, ok := config.Apps[project]; ok {
 		logger.Info("triggering event", "project", project, "event", event)
-		signature := ctx.GetHeader("X-Hub-Signature-256")
+		signature := r.Header.Get("X-Hub-Signature-256")
 		payload, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(500)
