@@ -9,11 +9,7 @@ import (
 	"github.com/matfire/hammer/types"
 )
 
-func Pull(config types.Config, app types.App, releasePayload types.GithubReleasePayload) {
-	/*auth := &http.BasicAuth{
-		Username: config.Username,
-		Password: config.Password,
-	}*/
+func Pull(app types.App, releasePayload types.GithubReleasePayload) {
 	repo, err := git.PlainOpen(app.Path)
 	if err != nil {
 		panic("path is not a valid repo")
