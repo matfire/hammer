@@ -4,12 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
-	"github.com/gin-gonic/gin"
 	"github.com/matfire/hammer/server"
 	"github.com/matfire/hammer/types"
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -45,10 +45,8 @@ func main() {
 	}
 	logger.Info("decoded toml file")
 	instance := server.NewServer(&config, logger)
+	logger.Info("starting server on port " + strconv.Itoa(port))
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), instance)
-	if !debug {
-		gin.SetMode(gin.ReleaseMode)
-	}
 	if err != nil {
 		panic("could not start server")
 	}
