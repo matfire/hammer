@@ -71,6 +71,8 @@ commands=["pnpm ci", "pnpm build"]
 There are flags you can pass to the program:
 
 - `--config`: enables to specify the path for the config file (ex: `hammer --config path/to/your/config.toml`)
+- `--port`: configs the port the webserver will run on (defaults to 8080)
+- `--log`: configures the file used to store logs (defaults to stdout)
 
 ## Deployment
 
