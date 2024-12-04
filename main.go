@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"github.com/charmbracelet/log"
 	"github.com/matfire/hammer/server"
 	"github.com/matfire/hammer/types"
 	"log/slog"
@@ -24,7 +25,8 @@ func main() {
 	flag.BoolVar(&debug, "debug", false, "turns on debug mode for the web server (defaults to off)")
 	flag.StringVar(&logFile, "log", "stdout", "where to write logs (defaults to stdout)")
 	flag.Parse()
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	handler := log.New(os.Stdout)
+	logger := slog.New(handler)
 	if logFile != "stdout" {
 		file, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
