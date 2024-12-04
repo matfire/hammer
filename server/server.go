@@ -5,13 +5,15 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"github.com/matfire/hammer/exec"
-	"github.com/matfire/hammer/git"
-	"github.com/matfire/hammer/types"
 	"io"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/matfire/hammer/exec"
+	"github.com/matfire/hammer/git"
+	"github.com/matfire/hammer/preserve"
+	"github.com/matfire/hammer/types"
 )
 
 func handleTrigger(w http.ResponseWriter, r *http.Request, config *types.Config, logger *slog.Logger) {
@@ -42,7 +44,13 @@ func handleTrigger(w http.ResponseWriter, r *http.Request, config *types.Config,
 				_, _ = w.Write([]byte("could not parse body data"))
 				return
 			}
+			if len(projectConfig.Preserve) > 0 {
+				preserve.Preserve(projectConfig, logger)
+			}
 			git.Pull(projectConfig, releasePayload)
+			if len(projectConfig.Preserve) > 0 {
+				preserve.Restore(projectConfig, logger)
+			}
 			for i := 0; i < len(projectConfig.Commands); i++ {
 				logger.Info("executing command", "project", project, "command", projectConfig.Commands[i], "index", i)
 				err = exec.Exec(projectConfig.Commands[i], projectConfig.Path)
