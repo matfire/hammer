@@ -9,6 +9,7 @@ type App struct {
 	Path     string
 	Commands []string
 	Secret   string
+	Preserve []string
 }
 
 type GithubRelease struct {
